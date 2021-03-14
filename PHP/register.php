@@ -98,7 +98,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
          
         if($stmt = mysqli_prepare($link, $sql)){
             // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "sssssss", $param_username, $param_password, $param_first_name, $param_last_name, $param_short_bio, $param_email_address, $param_fav_number);
+            mysqli_stmt_bind_param($stmt, "ssssssi", $param_username, $param_password, $param_first_name, $param_last_name, $param_short_bio, $param_email_address, $param_fav_number);
             
             // Set parameters
             $param_username = $username;
@@ -158,8 +158,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <span class="help-block"><?php echo $short_bio_err; ?></span>
             </div>
 			<div class="form-group <?php echo (!empty($fav_number_err)) ? 'has-error' : ''; ?>">
-                <label>Favorite Number</label>
-                <input type="text" name="fav_number" class="form-control" value="<?php echo $fav_number; ?>">
+                <label>Favorite Integer</label>
+                <input type="number" min="-100000000000000000000" step="1" name="fav_number" class="form-control" value="<?php echo $fav_number; ?>">
                 <span class="help-block"><?php echo $fav_number_err; ?></span>
             </div>
 			<div class="form-group <?php echo (!empty($email_address_err)) ? 'has-error' : ''; ?>">

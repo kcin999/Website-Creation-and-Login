@@ -35,7 +35,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Validate credentials
     if(empty($username_err) && empty($password_err)){
         // Prepare a select statement
-        $sql = "SELECT id, username, password FROM users WHERE username = ?";
+        $sql = "SELECT id, username, password, fav_number, last_login , first_name, last_name FROM users WHERE username = ?";
         
         if($stmt = mysqli_prepare($link, $sql)){
             // Bind variables to the prepared statement as parameters
@@ -52,19 +52,33 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 // Check if username exists, if yes then verify password
                 if(mysqli_stmt_num_rows($stmt) == 1){                    
                     // Bind result variables
-                    mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password);
+                    mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password, $fav_number, $last_login, $first_name, $last_name);
                     if(mysqli_stmt_fetch($stmt)){
                         if(password_verify($password, $hashed_password)){
                             // Password is correct, so start a new session
-                            session_start();
-                            
+                                    
                             // Store data in session variables
                             $_SESSION["loggedin"] = true;
                             $_SESSION["id"] = $id;
-                            $_SESSION["username"] = $username;                  
+                            $_SESSION["username"] = $username;
+                            $_SESSION["fav_number"] = $fav_number;   
+                            $_SESSION["last_login"] = $last_login;        
+                            $_SESSION["first_name"] = $first_name;      
+                            $_SESSION["last_name"] = $last_name;
                             
+                            mysqli_stmt_close($stmt);
+                            $sql = "UPDATE users SET last_login = CONVERT_TZ(NOW(), '+0:00', '-4:00') WHERE id=$id";
+                            if($stmt = mysqli_prepare($link, $sql)){
+                                if(mysqli_stmt_execute($stmt)){
+                                    header("location: welcome.php");
+                                }else{
+                                    echo "Something went wrong.";
+
+                                }
+                                mysqli_stmt_close($stmt);
+                            }
                             // Redirect user to welcome page
-                            header("location: welcome.php");
+
                         } else{
                             // Display an error message if password is not valid
                             $password_err = "The password you entered was not valid.";
